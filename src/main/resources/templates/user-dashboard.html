@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard | Polling System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-brand">
+        <i class="fas fa-poll"></i>
+        <h1>User Dashboard</h1>
+    </div>
+    <a href="/logout" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+    </a>
+</nav>
+
+<main class="dashboard-container">
+    <section class="polls">
+        <div class="section-header">
+            <h2><i class="fas fa-list"></i> Available Polls</h2>
+        </div>
+
+        <div class="error-message" th:if="${error}">
+            <i class="fas fa-exclamation-circle"></i>
+            <p th:text="${error}"></p>
+        </div>
+
+        <div class="poll-card" th:each="poll : ${polls}">
+            <div class="poll-header">
+                <h3 th:text="${poll.title}"></h3>
+                <span class="poll-status" th:classappend="${poll.isExpired ? 'expired' : 'active'}">
+                        <i th:class="${poll.isExpired ? 'fas fa-clock' : 'fas fa-check-circle'}"></i>
+                        <span th:text="${poll.isExpired ? 'Expired' : 'Active'}"></span>
+                    </span>
+            </div>
+
+            <p class="poll-expiry">
+                <i class="far fa-calendar-alt"></i>
+                Expires at: <span th:text="${poll.expiresAt}"></span>
+            </p>
+
+            <div th:if="${poll.hasVoted}" class="voted">
+                <i class="fas fa-check-circle"></i>
+                You have already voted for this poll
+            </div>
+
+            <form th:action="@{/poll/vote}" method="post" class="poll-form">
+                <input type="hidden" th:value="${poll.id}" name="pollId">
+                <div class="options">
+                    <div th:each="option : ${poll.options}" class="option-item">
+                        <label>
+                            <input type="radio"
+                                   th:value="${option}"
+                                   name="option"
+                                   th:checked="${poll.selectedOption == option}"
+                                   required>
+                            <span th:text="${option}"></span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" th:disabled="${poll.isExpired || poll.hasVoted}" class="btn">
+                    <i class="fas fa-vote-yea"></i>
+                    Vote
+                </button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>
