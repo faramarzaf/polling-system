@@ -1,4 +1,4 @@
-package org.example.pollingsystem;
+package org.example.pollingsystem.dto;
 
 public enum Role {
     ROLE_USER,
