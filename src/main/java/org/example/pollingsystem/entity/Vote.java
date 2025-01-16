@@ -19,7 +19,7 @@ public class Vote {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String voteOption;  // Assuming you store the chosen option
+    private String voteOption;
 
 
     public Long getId() {

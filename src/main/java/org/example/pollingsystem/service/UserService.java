@@ -34,7 +34,7 @@ public class UserService {
     public User save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(user.getRole());
-        user.setVerified(false);  // Initially unverified
+        user.setVerified(false);
         return userRepository.save(user);
     }
 }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Poll Statistics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .poll-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .poll-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        .poll-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .poll-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-container {
+            margin-bottom: 1rem;
+        }
+
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-text {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .option-percentage {
+            font-weight: 600;
+            color: #4338ca;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.75rem;
+            background-color: #f3f4f6;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4338ca;
+            border-radius: 1rem;
+            transition: width 0.3s ease;
+        }
+
+        .status-expired {
+            color: #ef4444;
+        }
+
+        .status-active {
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-header">
+    <div class="header-content">
+        <h1>
+            <i class="fas fa-chart-pie"></i>
+            Poll Statistics
+        </h1>
+        <div>
+            <a href="/admin/dashboard" class="logout-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<main class="admin-main">
+    <div th:each="poll : ${pollStats}" class="poll-card">
+        <h2 class="poll-title" th:text="${poll.title}"></h2>
+
+        <div class="poll-meta">
+            <div class="poll-meta-item">
+                <i class="far fa-calendar-alt"></i>
+                <span>Created: </span>
+                <span th:text="${#temporals.format(poll.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+            <div class="poll-meta-item">
+                <i class="fas fa-users"></i>
+                <span>Total Votes: </span>
+                <span th:text="${poll.totalVotes}"></span>
+            </div>
+            <div class="poll-meta-item">
+                <i class="fas fa-clock"></i>
+                <span>Status: </span>
+                <span th:text="${poll.expired ? 'Expired' : 'Active'}"
+                      th:class="${poll.expired ? 'status-expired' : 'status-active'}">
+                    </span>
+            </div>
+        </div>
+
+        <div th:each="option : ${poll.optionStats}" class="option-container">
+            <div class="option-header">
+                <span class="option-text" th:text="${option.optionText}"></span>
+                <span class="option-percentage" th:text="${option.percentage + '%'}"></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width: ' + ${option.percentage + '%'}"></div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
