@@ -1,7 +1,7 @@
 package org.example.pollingsystem.entity;
 
 import jakarta.persistence.*;
-import org.example.pollingsystem.Role;
+import org.example.pollingsystem.dto.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
