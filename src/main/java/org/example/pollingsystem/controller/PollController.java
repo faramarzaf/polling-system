@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -85,23 +86,25 @@ public class PollController {
     }
 
     @PostMapping("/poll/vote")
-    public String voteForPoll(Long pollId, String option, Model model) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    public String voteForPoll(Long pollId, String option,
+                              @RequestParam(defaultValue = "0") int page, RedirectAttributes redirectAttributes) {
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userService.findByUsername(username);
 
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found: " + pollId));
 
         if (option == null || option.trim().isEmpty()) {
-            throw new IllegalArgumentException("No option selected");
+            redirectAttributes.addFlashAttribute("error", "No option selected");
+            return "redirect:/user/dashboard?page=" + page;
         }
 
         boolean hasVoted = voteRepository.existsByPollAndUser(poll, currentUser);
 
         if (hasVoted) {
-            model.addAttribute("error", "You have already voted in this poll.");
-            return "user-dashboard";
+            redirectAttributes.addFlashAttribute("error", "You have already voted in this poll.");
+            return "redirect:/user/dashboard?page=" + page;
         }
 
         Vote vote = new Vote();
@@ -109,6 +112,7 @@ public class PollController {
         vote.setUser(currentUser);
         vote.setVoteOption(option);
         voteRepository.save(vote);
-        return "redirect:/user/dashboard";
+
+        return "redirect:/user/dashboard?page=" + page;
     }
 }

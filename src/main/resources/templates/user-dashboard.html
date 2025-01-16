@@ -52,6 +52,7 @@
 
             <form th:action="@{/poll/vote}" method="post" class="poll-form">
                 <input type="hidden" th:value="${poll.id}" name="pollId">
+                <input type="hidden" th:value="${currentPage}" name="page">
                 <div class="options">
                     <div th:each="option : ${poll.options}" class="option-item">
                         <label>
@@ -92,5 +93,46 @@
     </div>
 
 </main>
+
+
+<script>
+    // Function to preserve scroll position
+    function handleVoteSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const scrollPosition = window.scrollY;
+
+        // Create FormData from the form
+        const formData = new FormData(form);
+
+        // Send the form using fetch
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.redirected) {
+                    // Store the scroll position before redirecting
+                    sessionStorage.setItem('scrollPosition', scrollPosition);
+                    window.location.href = response.url;
+                }
+            });
+    }
+
+    // Restore scroll position on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
+
+    // Add submit handler to all poll forms
+    document.querySelectorAll('.poll-form').forEach(form => {
+        form.addEventListener('submit', handleVoteSubmit);
+    });
+</script>
+
 </body>
 </html>
