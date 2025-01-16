@@ -26,7 +26,7 @@ public class Poll {
     @JoinColumn(name = "user_id")
     private User createdBy;
 
-    @OneToMany(mappedBy = "poll")
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes;
 
     private LocalDateTime expiresAt;
