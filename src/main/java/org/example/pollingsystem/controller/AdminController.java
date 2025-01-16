@@ -2,11 +2,11 @@ package org.example.pollingsystem.controller;
 
 import org.example.pollingsystem.dto.PollStatistics;
 import org.example.pollingsystem.service.PollStatisticsService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AdminController {
@@ -18,9 +18,14 @@ public class AdminController {
     }
 
     @GetMapping("/admin/statistics")
-    public String showStatistics(Model model) {
-        List<PollStatistics> pollStats = pollStatisticsService.generatePollStatistics();
-        model.addAttribute("pollStats", pollStats);
+    public String showStatistics(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "5") int size,
+                                 Model model) {
+        Page<PollStatistics> pollStats = pollStatisticsService.generatePollStatistics(page, size);
+        model.addAttribute("pollStats", pollStats.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", pollStats.getTotalPages());
+        model.addAttribute("totalItems", pollStats.getTotalElements());
         return "statistics";
     }
 }

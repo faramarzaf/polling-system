@@ -5,6 +5,9 @@ import org.example.pollingsystem.dto.PollStatistics;
 import org.example.pollingsystem.entity.Poll;
 import org.example.pollingsystem.entity.Vote;
 import org.example.pollingsystem.repo.PollRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +22,15 @@ public class PollStatisticsService {
 
     public PollStatisticsService(PollRepository pollRepository) {
         this.pollRepository = pollRepository;
+    }
+
+    public Page<PollStatistics> generatePollStatistics(int page, int size) {
+        Page<Poll> pollPage = pollRepository.findAll(PageRequest.of(page, size));
+        List<PollStatistics> statsContent = pollPage.getContent().stream()
+                .map(this::createPollStatistics)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(statsContent, pollPage.getPageable(), pollPage.getTotalElements());
     }
 
     public List<PollStatistics> generatePollStatistics() {

@@ -129,6 +129,25 @@
             </div>
         </div>
     </div>
+
+    <div th:if="${totalPages > 1}" class="pagination-container">
+        <div class="pagination">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/admin/statistics(page=${currentPage - 1})}"
+               class="pagination-button">&laquo; Previous</a>
+
+            <span th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/admin/statistics(page=${pageNum})}"
+               th:text="${pageNum + 1}"
+               th:class="${pageNum == currentPage} ? 'pagination-button active' : 'pagination-button'"></a>
+        </span>
+
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/admin/statistics(page=${currentPage + 1})}"
+               class="pagination-button">Next &raquo;</a>
+        </div>
+    </div>
+
 </main>
 </body>
 </html>

@@ -4,17 +4,18 @@ import org.example.pollingsystem.entity.Poll;
 import org.example.pollingsystem.entity.User;
 import org.example.pollingsystem.entity.Vote;
 import org.example.pollingsystem.repo.PollRepository;
-import org.example.pollingsystem.repo.UserRepository;
 import org.example.pollingsystem.repo.VoteRepository;
 import org.example.pollingsystem.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Controller
@@ -22,6 +23,7 @@ public class PollController {
     private final PollRepository pollRepository;
     private final VoteRepository voteRepository;
     private final UserService userService;
+    private static final int PAGE_SIZE = 5;
 
     public PollController(PollRepository pollRepository, VoteRepository voteRepository, UserService userService) {
         this.pollRepository = pollRepository;
@@ -49,8 +51,11 @@ public class PollController {
     }
 
     @GetMapping("/user/dashboard")
-    public String showUserDashboard(Model model) {
-        List<Poll> polls = pollRepository.findAll();
+    public String showUserDashboard(@RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "5") int size,
+                                    Model model) {
+        Page<Poll> pollPage = pollRepository.findAll(PageRequest.of(page, size));
+        List<Poll> polls = pollPage.getContent();
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userService.findByUsername(username);
@@ -67,13 +72,15 @@ public class PollController {
 
             boolean isExpired = false;
             if (poll.getExpiresAt() != null) {
-                long expiresAtTimestamp = poll.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-                isExpired = expiresAtTimestamp < System.currentTimeMillis();
+                isExpired = poll.getExpiresAt().isBefore(LocalDateTime.now());
             }
             poll.setExpired(isExpired);
         }
 
         model.addAttribute("polls", polls);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", pollPage.getTotalPages());
+        model.addAttribute("totalItems", pollPage.getTotalElements());
         return "user-dashboard";
     }
 
