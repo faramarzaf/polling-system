@@ -38,7 +38,7 @@
                 Role
             </label>
             <select id="role" th:field="*{role}" class="dropdown">
-                <option th:each="role : ${T(org.example.pollingsystem.Role).values()}"
+                <option th:each="role : ${T(org.example.pollingsystem.dto.Role).values()}"
                         th:value="${role}"
                         th:text="${role}"></option>
             </select>
