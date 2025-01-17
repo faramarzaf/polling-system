@@ -8,7 +8,8 @@ A robust web-based polling application built with Spring Boot that allows users 
 
 ## Features
 
-- User Authentication & Authorization
+**User Authentication & Authorization**
+
 - Secure user registration and login
 - Role-based access control (Admin/User)
 - Password encryption using BCrypt
